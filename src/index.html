@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shutdown PC App</title>
+  <script type="module" src="/main.js" defer></script>
+</head>
+
+<body>
+  <main class="container">
+    <h1>Win UI SHUTDOWN</h1>
+    <div id="timer" style="display: none;">Time remaining: <span id="countdown"></span></div>
+    <div class="buttons-container">
+      <button id="shutdown-30m">30 min</button>
+      <button id="shutdown-1h">1 hour</button>
+      <button id="shutdown-2h">2 hours</button>
+      <button id="last-custom">Custom</button>
+    </div>
+    <div class="row">
+
+    </div>
+    <div class="row">
+    </div>
+
+    <form class="row" id="custom-form">
+      <input id="custom-input" type="text" placeholder="Minutes..." maxlength="4" />
+      <button type="submit">Set Custom</button>
+    </form>
+
+    <div class="row">
+      <button id="cancel">Cancel Shutdown</button>
+    </div>
+
+    <p id="status-msg"></p>
+  </main>
+</body>
+
+</html>
