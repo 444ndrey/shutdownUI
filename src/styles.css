@@ -125,6 +125,38 @@ button:hover {
   margin-right: 5px;
 }
 
+body.locked button{
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+#status-spinner {
+  width: 2rem;
+  height: 2rem;
+  margin: 0.75rem auto 0;
+  border: 4px solid rgba(86, 85, 177, 0.25);
+  border-top-color: #5655b1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+body.locked #status-spinner {
+  display: block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media (prefers-color-scheme: dark) {
 

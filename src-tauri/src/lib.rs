@@ -1,4 +1,20 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use std::process::Command;
+
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+fn shutdown_command() -> Command {
+    let mut cmd = Command::new("shutdown");
+    #[cfg(target_os = "windows")]
+    {
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    cmd
+}
+
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -6,33 +22,40 @@ fn greet(name: &str) -> String {
 
 #[tauri::command]
 fn shutdown_now() -> Result<String, String> {
-    match std::process::Command::new("shutdown").args(&["/s", "/t", "0"]).output() {
-        Ok(_) => Ok("Shutdown initiated.".to_string()),
-        Err(e) => Err(format!("Failed to shutdown: {}", e)),
-    }
+    shutdown_command()
+        .args(["/s", "/t", "0"])
+        .spawn()
+        .map(|_| "Shutdown initiated.".to_string())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 fn shutdown_in_seconds(seconds: u32) -> Result<String, String> {
-    match std::process::Command::new("shutdown").args(&["/s", "/t", &seconds.to_string()]).output() {
-        Ok(_) => Ok(format!("Shutdown scheduled in {} seconds.", seconds)),
-        Err(e) => Err(format!("Failed to schedule shutdown: {}", e)),
-    }
+    shutdown_command()
+        .args(["/s", "/t", &seconds.to_string()])
+        .spawn()
+        .map(|_| format!("Shutdown scheduled in {} seconds.", seconds))
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 fn cancel_shutdown() -> Result<String, String> {
-    match std::process::Command::new("shutdown").arg("/a").output() {
-        Ok(_) => Ok("Shutdown cancelled.".to_string()),
-        Err(e) => Err(format!("Failed to cancel shutdown: {}", e)),
-    }
+    shutdown_command()
+        .arg("/a")
+        .spawn()
+        .map(|_| "Shutdown cancelled.".to_string())
+        .map_err(|e| e.to_string())
 }
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
+// 🚀 главный запуск приложения
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, shutdown_now, shutdown_in_seconds, cancel_shutdown])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            shutdown_now,
+            shutdown_in_seconds,
+            cancel_shutdown
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

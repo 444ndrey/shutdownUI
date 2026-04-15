@@ -10,18 +10,15 @@ async function showMessage(message) {
   statusMsgEl.textContent = message;
 }
 
-
-async function shutdownNow() {
-  try {
-    const result = await invoke("shutdown_now");
-    showMessage(result);
-  } catch (error) {
-    showMessage(`Error: ${error}`);
-  }
+const app = document.querySelector('body');
+function lockUI(value = true){
+    app.classList.toggle('locked', value);
 }
+
 
 async function shutdownInSeconds(seconds) {
   try {
+    lockUI();
     const result = await invoke("shutdown_in_seconds", { seconds });
     showMessage(result);
     if (seconds > 0) {
@@ -30,15 +27,22 @@ async function shutdownInSeconds(seconds) {
   } catch (error) {
     showMessage(`Error: ${error}`);
   }
+  finally {
+    lockUI(false);
+  }
 }
 
 async function cancelShutdown() {
   try {
+     lockUI();
     const result = await invoke("cancel_shutdown");
     showMessage(result);
     stopTimer();
   } catch (error) {
     showMessage(`Error: ${error}`);
+  }
+  finally{
+     lockUI(false);
   }
 }
 
