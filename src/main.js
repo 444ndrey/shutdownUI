@@ -23,6 +23,7 @@ async function shutdownInSeconds(seconds) {
     showMessage(result);
     if (seconds > 0) {
       startTimer(seconds);
+      localStorage.setItem('shutdownEndTime', Date.now() + seconds * 1000);
     }
   } catch (error) {
     showMessage(`Error: ${error}`);
@@ -38,6 +39,7 @@ async function cancelShutdown() {
     const result = await invoke("cancel_shutdown");
     showMessage(result);
     stopTimer();
+    localStorage.removeItem('shutdownEndTime');
   } catch (error) {
     showMessage(`Error: ${error}`);
   }
@@ -78,6 +80,7 @@ function startTimer(seconds) {
       timerInterval = null;
       hideTimer();
       showButtons();
+      localStorage.removeItem('shutdownEndTime');
       showMessage("Shutdown initiated.");
     }
   }, 1000);
@@ -114,12 +117,42 @@ function stopTimer() {
     remainingSeconds = 0;
     hideTimer();
     showButtons();
+    localStorage.removeItem('shutdownEndTime');
+  }
+}
+
+async function checkExistingShutdown() {
+  const storedEndTime = localStorage.getItem('shutdownEndTime');
+  if (storedEndTime) {
+    const endTime = parseInt(storedEndTime);
+    const now = Date.now();
+    if (endTime > now) {
+      try {
+        const result = await invoke("cancel_shutdown", {});
+        if (result === "Shutdown cancelled.") {
+          // There was a shutdown, re-schedule
+          const remainingMs = endTime - now;
+          const remainingSec = Math.ceil(remainingMs / 1000);
+          await shutdownInSeconds(remainingSec);
+          showMessage(`Timer was recreated with saved time`);
+        } else {
+          // No shutdown, remove
+          localStorage.removeItem('shutdownEndTime');
+        }
+      } catch (error) {
+        localStorage.removeItem('shutdownEndTime');
+      }
+    } else {
+      localStorage.removeItem('shutdownEndTime');
+    }
   }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
   statusMsgEl = document.querySelector("#status-msg");
   lastCustomButton = document.querySelector("#last-custom");
+
+  checkExistingShutdown();
 
   document.querySelector("#shutdown-30m").addEventListener("click", () => {
     shutdownInSeconds(1800);

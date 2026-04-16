@@ -40,11 +40,16 @@ fn shutdown_in_seconds(seconds: u32) -> Result<String, String> {
 
 #[tauri::command]
 fn cancel_shutdown() -> Result<String, String> {
-    shutdown_command()
+    let output = shutdown_command()
         .arg("/a")
-        .spawn()
-        .map(|_| "Shutdown cancelled.".to_string())
-        .map_err(|e| e.to_string())
+        .output()
+        .map_err(|e| e.to_string())?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    if stdout.contains("No shutdown was scheduled") {
+        Ok("No shutdown was scheduled.".to_string())
+    } else {
+        Ok("Shutdown cancelled.".to_string())
+    }
 }
 
 // 🚀 главный запуск приложения

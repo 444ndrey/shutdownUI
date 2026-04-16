@@ -181,6 +181,17 @@ body.locked #status-spinner {
   }
 }
 
+html{
+  position: relative;
+}
+#app-version{
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  opacity: .3;
+  font-size: 0.75rem;
+}
+
 @media (max-width: 420px) or (max-height: 600px){
   button, input{
     padding: 0.5rem 1rem;
