@@ -5,15 +5,15 @@ A simple Windows desktop app for shutdown control, packaged with Tauri.
 ## Install from release
 
 1. Download the latest Windows release artifact for `Win UI SHUTDOWN`.
-2. If it is an installer (`.msi` or `.exe`), run it and follow the prompts.
-3. If it is a zip archive:
-   - Extract the folder.
-   - Run the included executable.
+2. Run installer (`.msi`) and follow the prompts.
 
 ## Use the app
 
 - Launch the installed app from the Start menu or the extracted folder.
 - Follow the app UI to perform shutdown actions.
+![Screenshot](/screenshot.png)
+
+![Screenshot with a runnig timer](/screenshot2.png)
 
 ## Build locally (optional)
 
